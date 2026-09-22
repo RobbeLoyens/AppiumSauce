@@ -1,0 +1,12 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.1.dtd" >
+<suite name="Suite">
+    <listeners>
+        <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
+    </listeners>
+    <test name="Tests">
+        <classes>
+            <class name="com.saucelabs.appium.NegativeLoginTests"/>
+            <class name="com.saucelabs.appium.LoginTests"/>
+        </classes>
+    </test>
+</suite>
