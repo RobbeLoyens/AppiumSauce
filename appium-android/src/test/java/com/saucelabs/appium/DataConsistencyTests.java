@@ -8,7 +8,25 @@ import com.saucelabs.appium.pages.CartPage;
 
 public class DataConsistencyTests extends ShopflowBaseTest {
 
+    @BeforeMethod
+    public void ensureCleanState() {
 
+        int attempts = 0;
+
+        while (!productPage.isProductsPageDisplayed() && attempts < 5) {
+            driver.navigate().back();
+            attempts++;
+        }
+
+        if (productPage.getCartBadgeCount() > 0) {
+            productPage.openCart();
+
+            cartPage.removeBikeLightIfPresent();
+            cartPage.removeBackpackIfPresent();
+
+            cartPage.continueShopping();
+        }
+    }
     @Test
     public void verifyProductInformationConsistencyAcrossPages() {
 

@@ -5,6 +5,7 @@
             <class name="com.saucelabs.appium.DataConsistencyTests">
                 <methods>
                     <include name="verifyProductInformationConsistencyAcrossPages"/>
+                    <include name="verifyCartStateConsistencyDuringNavigation"/>
                 </methods>
             </class>
         </classes>

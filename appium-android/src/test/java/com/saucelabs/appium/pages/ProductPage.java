@@ -83,17 +83,24 @@ public class ProductPage {
         return driver.findElement(cartBadge).isDisplayed();
     }
 
-    public boolean addBikeLightToCart() {
+    public void addBikeLightToCart() {
+
+       // System.out.println("Products page visible: " + isProductsPageDisplayed());
+
+       // System.out.println(driver.getPageSource());
+
         driver.findElement(bikeLightAddToCart).click();
-        return true;
     }
 
     public int getCartBadgeCount() {
-        String badgeCount =
-                driver.findElement(cartBadgeCount)
-                        .getAttribute("text");
-        System.out.println("Badge count: " + badgeCount);
-        return Integer.parseInt(badgeCount);
+
+        if (driver.findElements(cartBadgeCount).isEmpty()) {
+            return 0;
+        }
+
+        return Integer.parseInt(
+                driver.findElement(cartBadgeCount).getText()
+        );
     }
     public boolean isBackpackInCart() {
         return driver.findElement(backpackInCart).isDisplayed();
@@ -144,6 +151,8 @@ public class ProductPage {
                 driver.findElement(backpackPrice).getText()
         );
     }
-
+    public boolean isProductsPageDisplayed() {
+        return !driver.findElements(productsTitle).isEmpty();
+    }
 
 }

@@ -7,7 +7,8 @@ import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
+import java.util.List;
+import org.openqa.selenium.WebElement;
 import java.time.Duration;
 
 public class CartPage {
@@ -35,12 +36,21 @@ public class CartPage {
                     "//android.widget.TextView[@text='Sauce Labs Backpack']/following::android.view.ViewGroup[@content-desc='test-REMOVE'][1]"
             );
     private final By continueShoppingButton =
-            AppiumBy.accessibilityId("test-CONTINUE SHOPPING");
+            AppiumBy.xpath(
+                    "//android.view.ViewGroup[@content-desc='test-CONTINUE SHOPPING']"
+            );
     private final By removeBikeLightButton =
             AppiumBy.xpath(
                     "//android.widget.TextView[@text='Sauce Labs Bike Light']/following::android.view.ViewGroup[@content-desc='test-REMOVE'][1]"
             );
-
+    private final By backpackInCart =
+            AppiumBy.xpath(
+                    "//android.widget.TextView[@text='Sauce Labs Backpack']"
+            );
+    private final By bikeLightInCart =
+            AppiumBy.xpath(
+                    "//android.widget.TextView[@text='Sauce Labs Bike Light']"
+            );
     public CartPage(AppiumDriver driver) {
         this.driver = driver;
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
@@ -80,6 +90,35 @@ public class CartPage {
     }
 
     public void continueShopping() {
-        driver.findElement(continueShoppingButton).click();
+
+        List<WebElement> buttons =
+                driver.findElements(
+                        AppiumBy.xpath(
+                                "//*[@content-desc='test-CONTINUE SHOPPING']"));
+
+        System.out.println(
+                "Continue Shopping count = "
+                        + buttons.size());
+
+        if (!buttons.isEmpty()) {
+            buttons.get(0).click();
+        }
+    }
+    public boolean isBikeLightPresent() {
+        return !driver.findElements(bikeLightInCart).isEmpty();
+    }
+
+    public boolean isBackpackPresent() {
+        return !driver.findElements(backpackInCart).isEmpty();
+    }
+    public void removeBackpackIfPresent() {
+        if (isBackpackPresent()) {
+            removeBackpack();
+        }
+    }
+    public void removeBikeLightIfPresent() {
+        if (isBikeLightPresent()) {
+            removeBikeLight();
+        }
     }
 }
