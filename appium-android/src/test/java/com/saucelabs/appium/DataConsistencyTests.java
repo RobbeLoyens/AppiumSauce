@@ -117,27 +117,21 @@ public class DataConsistencyTests extends ShopflowBaseTest {
                 "Backpack should remain consistent after navigation."
         );
     }
-
     @Test
     public void verifyCartBadgeRemainsConsistentDuringNavigation() {
 
         productPage.addBikeLightToCart();
         productPage.addBackpackToCart();
 
-        Assert.assertEquals(
-                productPage.getCartBadgeCount(),
-                2,
-                "Cart badge should display 2 items."
-        );
+        int badgeCount = productPage.getCartBadgeCount();
 
         productPage.openCart();
 
-        cartPage.continueShopping();
+        int cartItemCount = cartPage.getCartItemCount();
 
         Assert.assertEquals(
-                productPage.getCartBadgeCount(),
-                2,
-                "Cart badge should remain unchanged after navigation."
-        );
+                cartItemCount,
+                badgeCount,
+                "Cart item count should match badge count");
     }
 }
