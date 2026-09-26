@@ -99,9 +99,9 @@ public class CartPage {
                         AppiumBy.xpath(
                                 "//*[@content-desc='test-CONTINUE SHOPPING']"));
 
-        System.out.println(
-                "Continue Shopping count = "
-                        + buttons.size());
+       // System.out.println(
+         //       "Continue Shopping count = "
+           //             + buttons.size());
 
         if (!buttons.isEmpty()) {
             buttons.get(0).click();

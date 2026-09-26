@@ -62,6 +62,11 @@ public class ProductPage {
     private final By bikeLightPrice =
             AppiumBy.xpath("//android.widget.TextView[@text='$9.99']");
 
+    private final By backpackDescription =
+            AppiumBy.xpath("//android.widget.TextView[@text='carry.allTheThings() with the sleek, streamlined Sly Pack that melds uncompromising style with unequaled laptop and tablet protection.']");
+
+    private final By bikelightDescription =
+            AppiumBy.xpath("//android.widget.TextView[@text='A red light isn't the desired state in testing but it sure helps when riding your bike at night. Water-resistant with 3 lighting modes, 1 AAA battery included.']");
 
 
     public ProductPage(AppiumDriver driver) {
@@ -155,4 +160,16 @@ public class ProductPage {
         return !driver.findElements(productsTitle).isEmpty();
     }
 
+    public Product getBackpackData() {
+
+        String name =
+                driver.findElement(backpackName).getText();
+
+        String price =
+                driver.findElement(backpackPrice).getText();
+
+        return new Product(
+                name,
+                price);
+    }
 }
