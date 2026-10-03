@@ -1,0 +1,15 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<suite name="API Website Consistency Suite">
+
+    <test name="API Website Consistency Tests">
+
+        <classes>
+
+            <class name="com.saucelabs.appium.APIWebConsistencyTests"/>
+
+        </classes>
+
+    </test>
+
+</suite>

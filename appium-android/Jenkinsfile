@@ -1,0 +1,69 @@
+pipeline {
+    agent {
+        label 'android'
+    }
+
+    tools {
+        jdk 'JDK17'
+        maven 'Maven 3.9'
+    }
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '20'))
+        disableConcurrentBuilds()
+        timestamps()
+        timeout(time: 60, unit: 'MINUTES')
+    }
+
+    parameters {
+        string(
+            name: 'APPIUM_SERVER_URL',
+            defaultValue: 'http://127.0.0.1:4723',
+            description: 'Appium server URL reachable from the Android build agent'
+        )
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Test') {
+            steps {
+                dir('appium-android') {
+                    catchError(
+                        buildResult: 'FAILURE',
+                        stageResult: 'FAILURE',
+                        catchInterruptions: false
+                    ) {
+                        sh 'mvn -B -ntp clean test -Dautomation.server.url="$APPIUM_SERVER_URL"'
+                    }
+                }
+            }
+        }
+
+        stage('Generate Allure report') {
+            steps {
+                dir('appium-android') {
+                    sh 'mvn -B -ntp allure:report'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            junit(
+                testResults: 'appium-android/target/surefire-reports/**/TEST-*.xml',
+                allowEmptyResults: true
+            )
+            archiveArtifacts(
+                artifacts: 'appium-android/target/surefire-reports/**/*,appium-android/target/allure-results/**/*,appium-android/target/allure-reports/**/*',
+                allowEmptyArchive: true,
+                fingerprint: true
+            )
+        }
+    }
+}

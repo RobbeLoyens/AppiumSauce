@@ -73,6 +73,6 @@ public final class AppiumConfig {
     }
 
     public static String get(String key, String defaultValue) {
-        return PROPERTIES.getProperty(key, defaultValue);
+        return System.getProperty(key, PROPERTIES.getProperty(key, defaultValue));
     }
 }

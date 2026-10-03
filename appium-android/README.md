@@ -104,7 +104,7 @@ mvn test -Dtest=LoginTests
 This project is configured to generate an Allure report for every test run. Each run is saved in a timestamped folder using the format:
 
 ```text
-smoketest-YY-MM-DD-HH-mm-ss
+smoketest-yyyy-MM-dd-HH-mm-ss
 ```
 
 Example output folder:
@@ -120,6 +120,60 @@ mvn clean verify
 ```
 
 Open the generated `index.html` file in the tagged run folder to view the latest smoke test report.
+
+## Jenkins CI
+
+The Jenkins pipeline is in `Jenkinsfile` in this Maven module. It checks out the GitHub repository, runs all four configured TestNG suites with Maven, publishes Surefire JUnit XML, and archives the Surefire and Allure outputs. The build is marked as failed if Maven tests fail, while report generation and artifact publication still run.
+
+### Pipeline architecture and agent requirements
+
+Use a Dockerized Jenkins LTS controller for job orchestration and a separate Linux build agent labelled `android` for the mobile tests. Configure the agent with:
+
+- JDK 17 and Maven 3.9, registered in Jenkins as `JDK17` and `Maven 3.9`
+- Node.js, Appium 2.x, and the UiAutomator2 driver
+- Android SDK platform tools and a connected Android emulator/device compatible with the sample APK (Android API 28 is recommended)
+- An Appium server listening on port 4723, or a reachable remote Appium service
+
+The Jenkins controller container does not need Android SDK, Appium, or an emulator. Keeping device execution on a dedicated agent avoids trying to run an Android emulator inside the controller container. If using a remote Appium service, set the job's `APPIUM_SERVER_URL` parameter to the service URL. Do not place credentials in that URL; configure any required secrets through Jenkins Credentials and the service's supported authentication mechanism.
+
+### Install Jenkins with Docker
+
+On a Docker host, create persistent storage and start the official Jenkins LTS image:
+
+```bash
+docker volume create jenkins_home
+docker run -d --name jenkins --restart unless-stopped \
+  -p 8080:8080 \
+  -v jenkins_home:/var/jenkins_home \
+  jenkins/jenkins:lts
+```
+
+Open `http://localhost:8080`, retrieve the initial administrator password with:
+
+```bash
+docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+```
+
+Complete the setup wizard and install the suggested plugins, including Pipeline, Git, GitHub Branch Source, and JUnit. Keep the controller and plugins updated, restrict access to Jenkins, and prefer connecting agents over WebSocket or SSH rather than exposing the inbound agent port.
+
+### Connect the GitHub project and configure the agent
+
+1. Add a Jenkins agent with the label `android`. Provision it on a Linux host that can run the Android emulator or access a physical device and Appium server. Ensure `adb devices` reports the device as `device`, and verify Appium is reachable at the configured URL from the agent.
+2. In **Manage Jenkins → Tools**, configure JDK 17 with the name `JDK17` and Maven 3.9 with the name `Maven 3.9`. These names must match the Jenkinsfile.
+3. Create a **Multibranch Pipeline** job (recommended for GitHub branch/PR discovery) or a Pipeline job pointing at this repository. Configure the GitHub repository and credentials if it is private. Set the Script Path to `appium-android/Jenkinsfile`.
+4. Run the job. For a non-default Appium server, set the `APPIUM_SERVER_URL` build parameter. TestNG and Surefire reports will be available in the Jenkins test results; download the archived `allure-reports` folder and open its `index.html` for the Allure report.
+
+The pipeline archives Allure HTML directly so it works without additional Jenkins reporting plugins. For an inline, navigable Allure trend view, install the Jenkins Allure plugin and configure it to publish `appium-android/target/allure-results` instead.
+
+### Existing Maven commands
+
+Run from `appium-android/` with an emulator/device and Appium server available:
+
+```bash
+mvn -B -ntp clean test
+```
+
+The Jenkins pipeline uses `mvn clean test` followed by `mvn allure:report` rather than `mvn verify` so an Allure HTML report can still be generated when tests fail. Locally, `mvn clean verify` remains the existing one-command option for running tests and generating Allure output on a successful test run.
 
 ## Change device capabilities
 

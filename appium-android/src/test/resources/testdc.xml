@@ -1,6 +1,9 @@
 <!DOCTYPE suite SYSTEM "https://testng.org/testdc-1.1.dtd">
 
 <suite name="DataConsistencySuite">
+    <listeners>
+        <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
+    </listeners>
 
     <test name="TC01_ProductInformationConsistency">
         <classes>

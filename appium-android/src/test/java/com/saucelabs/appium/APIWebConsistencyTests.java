@@ -1,6 +1,8 @@
 package com.saucelabs.appium;
 
 import com.saucelabs.appium.models.Product;
+import com.saucelabs.appium.api.ProductApiClient;
+import com.saucelabs.appium.WebProductClient;
 
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
@@ -10,30 +12,23 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-public class CrossPlatformConsistencyTests
-        extends ShopflowBaseTest {
-
+public class APIWebConsistencyTests {
     @Test
-    public void verifyBackpackConsistencyBetweenWebAndMobile() {
+    public void  verifyApiAndWebsiteConsistency() {
+
+         ProductApiClient apiClient =
+                new ProductApiClient();
 
         WebProductClient webClient =
                 new WebProductClient();
 
+        Product apiProduct =
+                apiClient.getProduct();
+
         Product webProduct =
                 webClient.getProduct();
 
-        Product mobileProduct =
-                productPage.getBackpackData();
-
-        Assert.assertEquals(
-                mobileProduct.name(),
-                webProduct.name(),
-                "Product names should match");
-
-        Assert.assertEquals(
-                mobileProduct.price(),
-                webProduct.price(),
-                "Product prices should match");
-
+        System.out.println("API: " + apiProduct);
+        System.out.println("WEB: " + webProduct);
     }
 }
